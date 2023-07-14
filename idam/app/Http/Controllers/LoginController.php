@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\LoginRequest;
+use Illuminate\Support\Facades\Cache;
 
 class LoginController extends Controller
 {
@@ -18,10 +19,19 @@ class LoginController extends Controller
             ], 401);
         }
 
-        $token = auth()->user()->createToken('auth_token')->accessToken;
 
+        $token = Cache::get($request->bearerToken()) ?? auth()->user()->createToken('access_token')->accessToken;
+
+        $auth = Cache::remember($token, 60 * 60 * 60, function () use ($token) {
+            return [
+                'id' => auth()->user()->id,
+                'name' => auth()->user()->name,
+                'email' => auth()->user()->email,
+                'token' => $token,
+            ];
+        });
         return response()->json([
-            'access_token' => $token,
+            'access_token' => $auth['token'],
         ], 200);
     }
 }
