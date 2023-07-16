@@ -20,18 +20,17 @@ class LoginController extends Controller
         }
 
 
-        $token = Cache::get($request->bearerToken()) ?? auth()->user()->createToken('access_token')->accessToken;
+        $token = auth()->user()->createToken('access_token')->accessToken;
 
         $auth = Cache::remember($token, 60 * 60 * 60, function () use ($token) {
             return [
                 'id' => auth()->user()->id,
                 'name' => auth()->user()->name,
                 'email' => auth()->user()->email,
-                'token' => $token,
             ];
         });
         return response()->json([
-            'access_token' => $auth['token'],
+            'access_token' => $token,
         ], 200);
     }
 }
