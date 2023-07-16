@@ -16,9 +16,9 @@ class Company extends Model
         'website',
     ];
 
-    public function clients():HasMany
+    public function clients(): HasMany
     {
-        return  $this->hasMany(Client::class);
+        return $this->hasMany(Client::class);
     }
 
 
